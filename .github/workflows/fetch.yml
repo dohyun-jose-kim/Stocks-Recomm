@@ -1,0 +1,45 @@
+name: Fetch prediction market snapshots
+
+on:
+  schedule:
+    # UTC 기준. 한국시간 09시(00 UTC) + 21시(12 UTC) 하루 2회.
+    - cron: '0 0,12 * * *'
+  workflow_dispatch:  # Actions 탭에서 수동 실행 버튼
+
+permissions:
+  contents: write  # sqlite commit & push에 필요
+
+concurrency:
+  group: fetch  # 동시 실행 방지 (push 충돌 회피)
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run fetch_once
+        run: python src/collector/fetch_once.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/db/predmarket.sqlite
+          if git diff --cached --quiet; then
+            echo "No DB changes — skipping commit."
+          else
+            git commit -m "data: snapshot $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git push
+          fi

@@ -5,8 +5,13 @@ __pycache__/
 .venv/
 
 # Data outputs (디렉토리 골격은 .gitkeep으로 추적, 내용물은 제외)
+# predmarket.sqlite는 GitHub Actions가 매 실행 후 commit하므로 예외.
 data/db/*
 !data/db/.gitkeep
+!data/db/predmarket.sqlite
+data/db/*.sqlite-journal
+data/db/*.sqlite-wal
+data/db/*.sqlite-shm
 data/logs/*
 !data/logs/.gitkeep
 
