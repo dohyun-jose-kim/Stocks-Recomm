@@ -1,6 +1,14 @@
 .env
-temp/
-temp*
 __pycache__/
 *.pyc
 .DS_Store
+.venv/
+
+# Data outputs (디렉토리 골격은 .gitkeep으로 추적, 내용물은 제외)
+data/db/*
+!data/db/.gitkeep
+data/logs/*
+!data/logs/.gitkeep
+
+# Notebook 부산물
+.ipynb_checkpoints/
