@@ -2,8 +2,8 @@ name: Fetch prediction market snapshots
 
 on:
   schedule:
-    # UTC 기준. 한국시간 09시(00 UTC) + 21시(12 UTC) 하루 2회.
-    - cron: '0 0,12 * * *'
+    # UTC 기준. 한국시간 03/09/15/21시 (UTC 18/00/06/12) 하루 4회.
+    - cron: '0 0,6,12,18 * * *'
   workflow_dispatch:  # Actions 탭에서 수동 실행 버튼
 
 permissions:
