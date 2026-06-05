@@ -108,13 +108,67 @@ https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXFED&status
 ## 진행 현황 (이슈)
 
 - [#1 Epic](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/1) — 전체
-- [#2](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/2) [Spike] 무료 VM 제공자 선정 ← 게이트
-- [#3](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/3) VM 프로비저닝 & 과금 방지 설정
-- [#4](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/4) VM git push 인증 구성
-- [#5](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/5) cron + 수집 래퍼 스크립트
-- [#6](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/6) GitHub Actions 스케줄 OFF (cutover)
+- [x] [#2](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/2) [Spike] 무료 VM 제공자 선정 → **Google 확정**
+- [x] [#3](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/3) VM 프로비저닝 & 과금 방지 설정
+- [x] [#4](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/4) VM git push 인증 구성
+- [x] [#5](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/5) cron + 수집 래퍼 스크립트
+- [ ] [#6](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/6) GitHub Actions 스케줄 OFF (cutover)
 
 작업 브랜치: `dev-new-croning-meth`
+
+---
+
+## 실행 기록 (2026-06-05)
+
+실제로 이날 한 작업 순서. 다음에 비슷한 걸 또 셋업하거나 문제 생겼을 때 참고용.
+
+### 만든 것
+- **VM**: Google Cloud `e2-micro`, 리전 `us-central1`, 표준 영구 디스크 10GB → Always Free. 인스턴스명 `pridiction-market-instance-...`
+- **계정 안전**: Free Trial 유지(유료 업그레이드 안 함) + 예산 알림 $1.
+- **repo 위치(VM)**: `~/01_/Stocks-Recomm` (홈: `/home/kimdohyun7942`)
+- **git 신원(VM)**: `predmarket-vm-google`
+- **push 인증**: fine-grained PAT(Contents: read/write, 이 repo만) + `credential.helper store` → `~/.git-credentials`에 저장
+- **cron**: `0 0,6,12,18 * * *` (UTC) = 한국시간 09/15/21/03. 로그 `~/fetch.log`.
+
+### IP 검증 결과 (#2)
+| 위치 | IP | Kalshi |
+|---|---|---|
+| 로컬 맥 | 가정용 | 200 |
+| GitHub Actions | Azure | **403** |
+| Colab | GCP | 200 |
+| GCP e2-micro VM | GCP | **200** ✅ |
+
+### 검증된 것
+- VM에서 `fetch_once.py` 정상 수집: Kalshi 109 / Polymarket 23.
+- `scripts/run_fetch.sh` 수동 실행: pull → 수집 → commit → push 전 과정 성공.
+- **git push 전송량이 작다**: 16MB DB인데도 델타 압축으로 push당 **~25~35KB**. → 앞서 걱정한 egress(월 1GB) 부담은 실제론 매우 작음.
+
+### 겪은 함정 / 우회
+- **이 repo는 PR이 비활성화**돼 있음 + 로컬에서 main 직접 push는 Claude Code 정책이 차단 → 그래서 **브랜치 머지는 VM에서 수행**한다:
+  ```bash
+  # VM에서 브랜치를 main에 머지·push (PR 우회)
+  cd ~/01_/Stocks-Recomm
+  git fetch origin
+  git merge origin/<branch> -m "..."
+  git push
+  ```
+- 콘솔 "월별 예상 가격"이 $6.11로 떠서 놀랐지만, **Always Free 할인은 견적에 안 보임** → 실제 청구 $0.
+
+---
+
+## FAQ
+
+**Q. SSH 터미널(또는 브라우저)을 닫아도 수집이 도나?**
+A. 돈다. cron은 VM 안에서 실행되고, SSH는 원격 접속 창일 뿐. VM은 24시간 켜져 있어서 창을 닫아도 6시간마다 자동 실행된다.
+
+**Q. 과금됐는지 어떻게 확인하나?**
+A. GCP 콘솔 → 결제(Billing) → 개요(현재 사용액/크레딧) 또는 보고서(SKU별). Always Free 사양이면 $0. 예산 알림 $1이 초과 시 메일로 통지.
+
+**Q. 90일 뒤엔?**
+A. $300 크레딧이 끝나면 e2-micro를 계속 쓰려면 "pay-as-you-go 업그레이드" 필요. 업그레이드 후에도 Always Free 한도 내면 $0, 초과분(주로 egress)만 소액. (위 "과금 안전" 섹션 참고)
+
+**Q. 토큰(PAT) 만료되면?**
+A. push가 조용히 실패 → `~/fetch.log`에 에러. 만료 전 새 토큰 발급 후 `~/.git-credentials` 갱신. 만료일을 캘린더에 적어둘 것.
 
 ---
 

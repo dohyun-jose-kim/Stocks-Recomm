@@ -99,10 +99,20 @@ crontab -e
 ```
 ```
 # UTC 0/6/12/18시 = 한국시간 09/15/21/03시 (기존 Actions와 동일 주기)
-0 0,6,12,18 * * * /bin/bash $HOME/Stocks-Recomm/scripts/run_fetch.sh >> $HOME/fetch.log 2>&1
+# 경로는 실제 clone 위치 기준 (이 repo는 ~/01_/Stocks-Recomm 에 받음)
+0 0,6,12,18 * * * /bin/bash /home/kimdohyun7942/01_/Stocks-Recomm/scripts/run_fetch.sh >> /home/kimdohyun7942/fetch.log 2>&1
 ```
 
 > ⚠️ VM 시스템 시계가 UTC인지 확인(`date`). GCP 기본은 UTC.
+> ⚠️ `cron`이 떠 있는지 확인: `systemctl is-active cron` → `active`. 아니면 `sudo apt-get install -y cron && sudo systemctl enable --now cron`.
+
+### cron 환경 테스트 (선택, 권장)
+수동 실행은 일반 쉘이라, cron의 최소 환경에서도 도는지 한 번 확인하면 확실하다. 임시로 매분 실행을 걸어 로그를 본 뒤 제거:
+```bash
+( crontab -l; echo "* * * * * /bin/bash /home/kimdohyun7942/01_/Stocks-Recomm/scripts/run_fetch.sh >> /home/kimdohyun7942/fetch.log 2>&1" ) | crontab -
+sleep 80; tail -n 25 ~/fetch.log         # run_fetch start ~ done 보이면 OK
+crontab -l | grep -v '^\* \* \* \* \*' | crontab -   # 임시 줄 제거 (6시간 줄만 남김)
+```
 
 ### 검증
 - `bash scripts/run_fetch.sh` 수동 1회 → origin/main에 스냅샷 커밋 올라오면 OK.
@@ -112,10 +122,12 @@ crontab -e
 
 ## 4. GitHub Actions 끄기 (cutover, #6)
 
-VM cron이 수 사이클 안정적으로 돈 걸 확인한 **뒤에** 한다.
+VM cron이 도는 걸 확인한 **뒤에** 한다. (단, 현재 Actions는 Kalshi 403으로 어차피 push 못 하고 실패만 하므로 작동하는 백업은 아님 — 노이즈 제거 목적이 큼)
 
-- `.github/workflows/fetch.yml`의 `schedule:` 블록 제거(또는 주석). `workflow_dispatch:`는 남겨 수동 실행은 유지.
-- 이로써 수집 주체가 VM 단일 → 이중 push 충돌 없음.
+- `.github/workflows/fetch.yml`의 `schedule:` 블록 제거. `workflow_dispatch:`는 남겨 수동 실행은 유지.
+- 이로써 수집 주체가 VM 단일 → 이중 push 충돌/실패 메일 없음.
+
+> 이 repo는 PR 비활성 + 로컬 main 직접 push 차단이라, 이 파일 변경도 **브랜치에 커밋 → VM에서 머지·push**로 main에 반영한다 (위 "겪은 함정" 참고).
 
 ---
 
