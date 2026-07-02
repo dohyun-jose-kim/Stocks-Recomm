@@ -17,3 +17,4 @@ data/logs/*
 
 # Notebook 부산물
 .ipynb_checkpoints/
+data/reports/
