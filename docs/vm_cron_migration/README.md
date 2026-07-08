@@ -114,6 +114,7 @@ https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXFED&status
 - [x] [#5](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/5) cron + 수집 래퍼 스크립트
 - [x] [#6](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/6) GitHub Actions 스케줄 OFF (cutover) — 2026-06-05 완료
 - [ ] [#8](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/8) 체험판 만료(9/4) 대응 — pay-as-you-go 업그레이드, 8월 초까지
+- [ ] [#10](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/10) DB 100MB 한도 — 저장 방식 재설계 (수집 확장 전제), 8월 중순 전
 
 작업 브랜치: `dev-new-croning-meth`
 
@@ -169,7 +170,7 @@ https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXFED&status
 
 ### ⚠️ 발견된 리스크 (신규)
 
-- **push 로그에 GH001 대용량 경고 발생 중** — DB가 50MB를 넘었다 (16MB→57.7MB, 한 달 새). 이 속도(~1.2MB/일)면 **8월 중순 100MB 초과 → GitHub push 거부 → 수집 백업이 조용히 끊김.** 체험판 만료(9/4)보다 먼저 오는 데드라인. 상세·대응 후보: [`../KNOWN_LIMITATIONS.md`](../KNOWN_LIMITATIONS.md).
+- **push 로그에 GH001 대용량 경고 발생 중** — DB가 50MB를 넘었다 (16MB→57.7MB, 한 달 새). 이 속도(~1.2MB/일)면 **8월 중순 100MB 초과 → GitHub push 거부 → 수집 백업이 조용히 끊김.** 체험판 만료(9/4)보다 먼저 오는 데드라인. 수집 확장 예정이라 더 당겨질 수 있음. 추적: [#10](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/10), 상세: [`../KNOWN_LIMITATIONS.md`](../KNOWN_LIMITATIONS.md).
 - **PAT 만료일이 어디에도 기록 안 됨** — fine-grained PAT는 만료가 필수라 언젠가 반드시 끊긴다. GitHub → Settings → Developer settings → Fine-grained tokens에서 확인해 여기와 캘린더에 기록할 것: **만료일 = (미기록)**.
 
 ### 다음 점검 때 볼 것

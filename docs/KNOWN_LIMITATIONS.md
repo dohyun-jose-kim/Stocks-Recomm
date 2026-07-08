@@ -16,4 +16,4 @@ append-only. 해결돼도 지우지 않고 ✅ 표시만 한다. (CLAUDE.md §1)
   3. Git LFS — 무료 한도(스토리지 1GB)가 곧 또 막혀 비추
   4. 오래된 스냅샷을 주기적으로 아카이브로 분리해 DB 슬림 유지
 - **주의**: 어느 쪽이든 수집 파이프라인 가드레일(CLAUDE.md §0)과 VM 쪽 `run_fetch.sh` 배포가 걸림. 단 이 데드라인이 체험판 만료(#8, 9/4)보다 **먼저** 온다.
-- **상태**: 미해결 (발견: `docs/vm_cron_migration/README.md` 2026-07-08 상태 점검)
+- **상태**: 미해결 — [#10](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/10)에서 추적. **수집 확장 예정(PLAN v0.2.0)이 전제**라 ~1.2MB/일은 하한선 — 땜질이 아닌 확장 내성 있는 저장 방식으로 결정할 것. (발견: `docs/vm_cron_migration/README.md` 2026-07-08 상태 점검)
