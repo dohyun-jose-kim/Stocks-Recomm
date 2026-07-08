@@ -112,7 +112,8 @@ https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXFED&status
 - [x] [#3](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/3) VM 프로비저닝 & 과금 방지 설정
 - [x] [#4](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/4) VM git push 인증 구성
 - [x] [#5](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/5) cron + 수집 래퍼 스크립트
-- [ ] [#6](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/6) GitHub Actions 스케줄 OFF (cutover)
+- [x] [#6](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/6) GitHub Actions 스케줄 OFF (cutover) — 2026-06-05 완료
+- [ ] [#8](https://github.com/dohyun-jose-kim/Stocks-Recomm/issues/8) 체험판 만료(9/4) 대응 — pay-as-you-go 업그레이드, 8월 초까지
 
 작업 브랜치: `dev-new-croning-meth`
 
@@ -153,6 +154,29 @@ https://api.elections.kalshi.com/trade-api/v2/markets?series_ticker=KXFED&status
   git push
   ```
 - 콘솔 "월별 예상 가격"이 $6.11로 떠서 놀랐지만, **Always Free 할인은 견적에 안 보임** → 실제 청구 $0.
+
+---
+
+## 상태 점검 (2026-07-08 — 셋업 후 첫 확인)
+
+한 달 무인 방치 후 SSH로 들어가 확인한 결과. 다음 점검 때 이 절에 이어서 기록.
+
+### ✅ 정상인 것
+
+- **크론 생존**: 2026-07-08T00:00Z 런까지 6시간 간격 수집·push 연속 성공 (`fetch.log` + `data: snapshot` 커밋 이력으로 확인). 셋업 이후 사람 손 없이 한 달 완주.
+- **크레딧**: ₩448,276 / ₩448,796 잔여 — 한 달 소진 ~₩520. e2-micro Always Free 사양이 제대로 잡혔다는 방증.
+- 크레딧 소멸 규칙 재확인: **"다 쓰거나 vs 9/4 기간만료" 중 먼저 오는 쪽에서 끝**, 잔액은 소멸(이월·환불 없음), 업그레이드해도 기간 연장 안 됨. 현 속도면 ~₩44만이 소멸하는 게 정상 (손해 아님 — 원래 그런 구조).
+
+### ⚠️ 발견된 리스크 (신규)
+
+- **push 로그에 GH001 대용량 경고 발생 중** — DB가 50MB를 넘었다 (16MB→57.7MB, 한 달 새). 이 속도(~1.2MB/일)면 **8월 중순 100MB 초과 → GitHub push 거부 → 수집 백업이 조용히 끊김.** 체험판 만료(9/4)보다 먼저 오는 데드라인. 상세·대응 후보: [`../KNOWN_LIMITATIONS.md`](../KNOWN_LIMITATIONS.md).
+- **PAT 만료일이 어디에도 기록 안 됨** — fine-grained PAT는 만료가 필수라 언젠가 반드시 끊긴다. GitHub → Settings → Developer settings → Fine-grained tokens에서 확인해 여기와 캘린더에 기록할 것: **만료일 = (미기록)**.
+
+### 다음 점검 때 볼 것
+
+- 레포 마지막 `data: snapshot` 커밋이 6시간 이내인가 (SSH 불필요한 공짜 헬스체크)
+- DB 크기 (100MB 카운트다운)
+- #8 진행 (업그레이드 후라면 청구 $0 확인)
 
 ---
 
