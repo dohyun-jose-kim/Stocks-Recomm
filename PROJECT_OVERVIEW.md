@@ -26,7 +26,7 @@
 - **언어**: Python only
 - **저장**: SQLite
 - **데이터 소스**: Polymarket Gamma/CLOB API, Kalshi Trade API (둘 다 키 불필요로 시작)
-- **실행 환경**: macOS 로컬, launchd 스케줄링
+- **실행 환경**: GCP VM(e2-micro) cron, 6시간 간격 — 당초 launchd → GitHub Actions → Kalshi IP 차단으로 VM 이전 (경위: `docs/vm_cron_migration/`)
 - **시각화**: matplotlib/plotly (필요해질 때)
 
 ## 프로젝트 구조
@@ -44,6 +44,6 @@ notebooks/    탐색용 노트북
 archive/      이전 광범위 계획 (참고용, 날짜 prefix)
 ```
 
-## 현재 상태
-- **단계**: 계획 단계. 아직 코드 없음.
-- **다음**: `plans/` 4개 파일을 읽고 수집기 MVP 착수 여부 결정.
+## 현재 상태 (2026-07-08 현행화)
+- **단계**: 수집 자동 가동 중(VM cron) + 탐색 MVP v0.1.0 완료. 최신 좌표는 `PLAN.md`, 진행 로그는 `TODO.md`가 권위.
+- **다음**: `PLAN.md` 로드맵 참조 (v0.2.0 커버리지 확장은 탐색 도구 실사용 후).

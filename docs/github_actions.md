@@ -1,5 +1,7 @@
 # GitHub Actions로 스케줄링하기
 
+> 🗄️ **STALE (2026-07-08 표기)** — 이 방식은 2026-06-05 Kalshi의 데이터센터 IP 차단(403)으로 **폐기**됐다. 현행 수집은 GCP VM cron: [`vm_cron_migration/`](vm_cron_migration/README.md). Actions 스케줄은 OFF(수동 실행 버튼만 유지). 이 문서는 Actions 방식의 원리 설명으로서 기록 보존용.
+
 이 문서는 우리 프로젝트에서 GitHub Actions를 왜, 어떻게 쓰는지 설명한다. 처음 보는 입장에서 풀어 쓴 것.
 
 ---
